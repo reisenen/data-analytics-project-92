@@ -1,9 +1,9 @@
---count total customers
+--customers count
 select
 	COUNT(c.customer_id ) as customers_count
 from customers c 
 
---count sales and sum income
+--top 10 total income
 select 
 	concat(e.first_name, ' ', e.last_name) as seller,
 	count(s.sales_id ) as operations,
@@ -15,7 +15,7 @@ group by seller
 order by income desc
 limit 10;
 
---count seller average income less than overall average income
+--lowest average income
 select 
 	concat(e.first_name, ' ', e.last_name) as seller,
 	floor(avg(s.quantity * p.price )) as average_income
@@ -27,7 +27,7 @@ having floor(avg(s.quantity * p.price )) <
 	(select avg(s.quantity * p.price) from sales s inner join products p on s.product_id = p.product_id)
 order by average_income;
 
---count seller average per day of week
+--day of the week income
 select 
 	concat(e.first_name, ' ', e.last_name) as seller,
 	trim(to_char(s.sale_date, 'day')) as day_of_week,
@@ -38,7 +38,7 @@ inner join employees e on s.sales_person_id = e.employee_id
 group by seller, day_of_week, extract(isodow from s.sale_date)
 order by extract(isodow from s.sale_date), seller;
 
---segment customers by age
+--age groups
 select
 	case
 		when c.age between 16 and 25 then '16-25'
@@ -50,7 +50,7 @@ from customers c
 group by age_category
 order by age_category;
 
---unique customers and income per month
+--customers by month
 select 
 	to_char(s.sale_date, 'yyyy-mm') as selling_month,
 	count(distinct s.customer_id) as total_customers,
@@ -60,7 +60,7 @@ inner join products p on s.product_id = p.product_id
 group by selling_month
 order by selling_month;
 
---customers first purchase with special offer
+--special offer
 with ranked_purchases as (
 	select
 		s.customer_id,
